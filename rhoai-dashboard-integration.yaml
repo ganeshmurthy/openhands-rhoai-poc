@@ -1,0 +1,24 @@
+apiVersion: dashboard.opendatahub.io/v1
+kind: OdhApplication
+metadata:
+  name: openhands
+  namespace: redhat-ods-applications
+  labels:
+    app: odh-dashboard
+    app.kubernetes.io/part-of: odh-dashboard
+spec:
+  displayName: "OpenHands AI Agent"
+  provider: "All Hands AI"
+  description: "AI-powered software engineering agent for autonomous code development, debugging, and feature implementation."
+  img: "https://avatars.githubusercontent.com/u/163618071?s=200&v=4"
+  docsLink: "https://docs.all-hands.dev/"
+  getStartedLink: "https://docs.all-hands.dev/modules/usage/getting-started"
+  category: "Red Hat managed"
+  support: "community"
+  route: "openhands-route"
+  routeNamespace: "openhands-poc"
+  kfdefApplications: []
+  getStartedMarkDown: |
+    # OpenHands AI Agent
+    
+    Launch OpenHands AI agent for autonomous software development.

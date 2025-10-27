@@ -1,0 +1,123 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openhands
+  namespace: openhands-poc
+  labels:
+    app: openhands
+    component: ai-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openhands
+  template:
+    metadata:
+      labels:
+        app: openhands
+        component: ai-agent
+    spec:
+      containers:
+      - name: openhands
+        image: ghcr.io/all-hands-ai/openhands:latest
+        command: ["/bin/bash", "-c"]
+        args: ["touch /var/run/docker.sock && chmod 666 /var/run/docker.sock && mkdir -p /opt/workspace_base/.openhands && chown -R 1001360000:0 /opt/workspace_base && bash /app/entrypoint.sh uvicorn openhands.server.listen:app --host 0.0.0.0 --port 3000"]
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        env:
+        - name: SANDBOX_USER_ID
+          value: "1001360000"  # Use OpenShift's assigned UID for sandboxed processes
+        - name: NO_DOCKER
+          value: "true"
+        - name: SANDBOX_RUNTIME_CONTAINER_IMAGE
+          value: "ghcr.io/all-hands-ai/runtime:latest"
+        - name: WORKSPACE_BASE
+          value: "/opt/workspace_base"
+        - name: LLM_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: openhands-config
+              key: llm_base_url
+        - name: LLM_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openhands-secrets
+              key: llm_api_key
+        - name: LLM_MODEL
+          valueFrom:
+            configMapKeyRef:
+              name: openhands-config
+              key: llm_model
+        - name: FILE_STORE_PATH
+          valueFrom:
+            configMapKeyRef:
+              name: openhands-config
+              key: file_store_path
+        volumeMounts:
+        - name: workspace
+          mountPath: /opt/workspace_base
+        - name: fake-docker-socket
+          mountPath: /var/run
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2"
+        securityContext:
+          runAsUser: 0  # Run as root - required for OpenHands entrypoint
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: workspace
+        persistentVolumeClaim:
+          claimName: openhands-workspace
+      - name: fake-docker-socket
+        emptyDir: {}
+      serviceAccountName: openhands-sa
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: openhands-workspace
+  namespace: openhands-poc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: gp3-csi
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: openhands-sa
+  namespace: openhands-poc
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: openhands-role
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: openhands-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: openhands-role
+subjects:
+- kind: ServiceAccount
+  name: openhands-sa
+  namespace: openhands-poc
