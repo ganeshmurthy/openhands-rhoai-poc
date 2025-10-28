@@ -25,8 +25,8 @@ OpenHands is an autonomous AI agent that specializes in software engineering tas
 # Navigate to the POC directory
 cd openhands-rhoai-poc
 
-# Make deployment script executable
-chmod +x deploy.sh
+# Make deployment script executable (if needed)
+chmod +x deploy.sh undeploy.sh
 ```
 
 ### 2. Configure RHOAI Integration
@@ -190,26 +190,6 @@ oc delete odhapplication openhands -n redhat-ods-applications
 oc delete clusterrole openhands-role
 oc delete clusterrolebinding openhands-binding
 ```
-
-## 📚 Next Steps
-
-1. **Production Readiness**
-   - Configure persistent storage for workspaces
-   - Set up monitoring and alerting
-   - Implement backup strategies
-   - Configure resource quotas
-
-2. **Advanced Integration**
-   - Connect to Git repositories
-   - Integrate with CI/CD pipelines
-   - Configure custom model endpoints
-   - Set up multi-tenant access
-
-3. **Security Hardening**
-   - Implement network policies
-   - Configure pod security standards
-   - Set up audit logging
-   - Review RBAC permissions
 
 ## 🤝 Support
 
