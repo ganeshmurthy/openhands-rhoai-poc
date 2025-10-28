@@ -22,6 +22,19 @@ metadata:
   namespace: openhands-poc
   labels:
     app: openhands
+  annotations:
+    # WebSocket and Socket.IO support
+    haproxy.router.openshift.io/timeout: "300s"
+    haproxy.router.openshift.io/balance: "source"
+    # Force WebSocket protocol support
+    haproxy.router.openshift.io/disable_cookies: "true"
+    haproxy.router.openshift.io/timeout-tunnel: "3600s"
+    # Additional WebSocket annotations
+    haproxy.router.openshift.io/timeout-check: "5s"
+    haproxy.router.openshift.io/timeout-connect: "10s"
+    haproxy.router.openshift.io/timeout-server: "300s"
+    # Enable HTTP/1.1 keep-alive for WebSocket upgrade
+    haproxy.router.openshift.io/set-forwarded-headers: "append"
 spec:
   to:
     kind: Service

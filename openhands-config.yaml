@@ -24,7 +24,7 @@ type: Opaque
 data:
   # Base64 encoded API key for RHOAI model serving
   # Empty API key - LLM endpoint is publicly accessible (same as product-recommender-system)
-  llm_api_key: ""  # Empty - no authentication required
+  llm_api_key: "c2stZHVtbXkta2V5LWZvci1wdWJsaWMtZW5kcG9pbnQ="  # Base64: sk-dummy-key-for-public-endpoint
 ---
 apiVersion: v1
 kind: Namespace

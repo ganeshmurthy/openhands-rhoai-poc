@@ -55,6 +55,14 @@ spec:
             configMapKeyRef:
               name: openhands-config
               key: file_store_path
+        # Minimal configuration - let OpenHands handle LLM config via UI
+        - name: LOG_LEVEL
+          value: "DEBUG"
+        # Force Socket.IO to use polling only (no WebSocket)
+        - name: SOCKETIO_TRANSPORTS
+          value: "polling"
+        - name: SOCKETIO_POLLING_ONLY
+          value: "true"
         volumeMounts:
         - name: workspace
           mountPath: /opt/workspace_base
