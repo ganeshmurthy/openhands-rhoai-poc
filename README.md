@@ -1,6 +1,35 @@
 # OpenHands RHOAI Integration POC
 
+## 🚨 Current Project Status
+
+Here is a summary of issues I faced with OpenHands. To make the proof of concept minimally viable, we need live chat to work. But I faced OpenShift compatibility issues because it is pretty restrictive when it comes to permissions (for good reason).
+
+### Root Problems:
+- **Entrypoint Script Dependencies**: OpenHands' entrypoint.sh requires root privileges for user management and Docker socket access
+- **Virtual Environment Permissions**: The Python venv in /app/.venv/bin/ cannot be executed by OpenShift's arbitrary UID assignments
+- **Complex Build Process**: OpenHands has intricate build dependencies (like build_vscode.py) that make system-wide installation and building your own image problematic
+- **Runtime Expectations**: All runtimes (local, cli, kubernetes) expect either Docker access or specific system dependencies that conflict with OpenShift's restricted-v2 SCC
+
+### What I Tried:
+- **Basic deployment** - worked for UI access
+- **LLM integration** - successfully connected to RHOAI endpoints
+- **Real-time chat** - blocked by Socket.IO/runtime initialization failures due to permission issues
+- **Multiple runtimes** - local, cli, kubernetes all failed due to permission issues
+- **Custom image approaches** - entrypoint bypass, venv permission fixes, system-wide installation
+
+### Conclusion:
+OpenHands was designed for environments with slightly more permissive security contexts (like standard Docker or less restrictive Kubernetes). OpenShift's security-first approach with arbitrary UIDs, read-only filesystems, and restricted capabilities creates fundamental incompatibilities.
+
+The POC successfully demonstrated the UI integration and LLM connectivity, but the core interactive functionality remains blocked by OpenShift's strict security model.
+
+### Future Outlook:
+Wait for OpenHands to develop OpenShift-compatible deployment modes.
+
+---
+
 This repository contains the configuration files and deployment scripts for integrating OpenHands AI agent with Red Hat OpenShift AI (RHOAI).
+
+
 
 ## 🎯 Overview
 
